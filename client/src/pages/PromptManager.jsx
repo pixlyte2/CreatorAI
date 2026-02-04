@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import { getRole } from "../utils/auth";
 
-import ChannelSidebar from "./ChannelSidebar";
-import PromptTypeTabs from "./PromptTypeTabs";
-import PromptEditor from "./PromptEditor";
+import ChannelSidebar from "../components/ChannelSidebar";
+import PromptTypeTabs from "../components/PromptTypeTabs";
+import PromptEditor from "../components/PromptEditor";
 
-const ManagePrompts = () => {
+const PromptManager = () => {
   const role = getRole();
 
   const [prompts, setPrompts] = useState([]);
@@ -105,4 +105,4 @@ const ManagePrompts = () => {
   );
 };
 
-export default ManagePrompts;
+export default PromptManager;

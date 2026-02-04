@@ -1,14 +1,12 @@
 const mongoose = require("mongoose");
 
-const promptSchema = new mongoose.Schema(
+const channelSchema = new mongoose.Schema(
   {
-    channelName: String,
-    promptType: String,
-    aiModel: String,
-    promptText: String,
+    name: { type: String, required: true },
     companyId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Company"
+      ref: "Company",
+      required: true
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -18,4 +16,4 @@ const promptSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Prompt", promptSchema);
+module.exports = mongoose.model("Channel", channelSchema);

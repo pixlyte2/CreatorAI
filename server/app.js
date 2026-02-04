@@ -2,7 +2,10 @@ const path = require("path");
 // Routes (optional – safe)
 const authRoutes = require("./routes/authRoutes");
 const promptRoutes = require("./routes/promptRoutes");
-const userRoutes = require("./routes/userRoutes")
+const userRoutes = require("./routes/userRoutes");
+const channelRoutes = require("./routes/channelRoutes");
+const promptTypeRoutes = require("./routes/promptTypeRoutes");
+
 const cors = require("cors");
 // Load .env from PROJECT ROOT
 require("dotenv").config();
@@ -29,9 +32,18 @@ app.use(express.json({ limit: "50mb" }));
 
 
 
+// app.use("/api/auth", authRoutes);
+// app.use("/api/users", userRoutes);
+// app.use("/api/prompts", promptRoutes);
+// app.use("/api/channels", channelRoutes);
+// app.use("/api/prompt-types", promptTypeRoutes);
+
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/channels", channelRoutes);
 app.use("/api/prompts", promptRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+
 
 
 app.listen(process.env.PORT,() => {

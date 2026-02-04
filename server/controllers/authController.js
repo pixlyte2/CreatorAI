@@ -1,39 +1,34 @@
-const User = require("../models/user");
-const Company = require("../models/company");
+
+
+
+
+const User = require("../models/User");
+const Company = require("../models/Company");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-/**
- * ADMIN REGISTER (creates company)
- */
+// Register Admin + Company
 const registerAdmin = async (req, res) => {
-  try {
-    const { name, email, password, companyName } = req.body;
+  const { name, email, password, companyName } = req.body;
 
-    const hash = await bcrypt.hash(password, 10);
+  const hash = await bcrypt.hash(password, 10);
+  const company = await Company.create({ name: companyName });
 
-    const company = await Company.create({ name: companyName });
+  const admin = await User.create({
+    name,
+    email,
+    password: hash,
+    role: "admin",
+    companyId: company._id
+  });
 
-    const admin = await User.create({
-      name,
-      email,
-      password: hash,
-      role: "admin",
-      companyId: company._id
-    });
+  company.createdBy = admin._id;
+  await company.save();
 
-    company.createdBy = admin._id;
-    await company.save();
-
-    res.json({ message: "Admin & Company created" });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+  res.json({ message: "Admin & Company created" });
 };
 
-/**
- * LOGIN (ALL USERS)
- */
+// Login
 const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -44,11 +39,7 @@ const login = async (req, res) => {
   if (!match) return res.status(401).json({ message: "Wrong password" });
 
   const token = jwt.sign(
-    {
-      id: user._id,
-      role: user.role,
-      companyId: user.companyId
-    },
+    { id: user._id, role: user.role, companyId: user.companyId },
     process.env.JWT_SECRET,
     { expiresIn: "1d" }
   );
@@ -60,3 +51,4 @@ module.exports = {
   registerAdmin,
   login
 };
+
