@@ -1,54 +1,56 @@
+const express = require("express");
 const path = require("path");
-// Routes (optional – safe)
-const authRoutes = require("./routes/authRoutes");
-const promptRoutes = require("./routes/promptRoutes");
-const userRoutes = require("./routes/userRoutes");
-const channelRoutes = require("./routes/channelRoutes");
-const promptTypeRoutes = require("./routes/promptTypeRoutes");
-
 const cors = require("cors");
-// Load .env from PROJECT ROOT
 require("dotenv").config();
 
-const express = require("express");
 const connectDB = require("./config/db");
 
-// Debug (remove later)
-console.log("ENV FILE:", path.join(__dirname, ".env"));
-console.log("MONGO_URI:", process.env.MONGO_URI);
+// Routes
+const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
+const channelRoutes = require("./routes/channelRoutes");
+const promptRoutes = require("./routes/promptRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
 
 // Connect MongoDB
 connectDB();
 
 const app = express();
-// 🔥 CORS FIX (ADD THIS)
+
+/**
+ * 🔐 Middleware
+ */
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "http://localhost:5173", // Vite frontend
     credentials: true,
   })
 );
+
 app.use(express.json({ limit: "50mb" }));
 
-
-
-// app.use("/api/auth", authRoutes);
-// app.use("/api/users", userRoutes);
-// app.use("/api/prompts", promptRoutes);
-// app.use("/api/channels", channelRoutes);
-// app.use("/api/prompt-types", promptTypeRoutes);
-
+/**
+ * 📌 API Routes
+ */
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/channels", channelRoutes);
 app.use("/api/prompts", promptRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
+/**
+ * 🧪 Health Check
+ */
+app.get("/", (req, res) => {
+  res.send("CreatorAI Backend is running 🚀");
+});
 
-
-app.listen(process.env.PORT,() => {
-console.log(`Server running on ${process.env.PORT}`);
+/**
+ * 🚀 Start Server
+ */
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
 });
 
 module.exports = app;
- 

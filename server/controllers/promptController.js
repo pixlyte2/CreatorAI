@@ -54,7 +54,7 @@
 
 
 
-const Prompt = require("../models/Prompt");
+const Prompt = require("../models/prompt");
 
 const createPrompt = async (req, res) => {
   const prompt = await Prompt.create({
