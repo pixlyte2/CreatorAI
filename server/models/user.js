@@ -7,13 +7,14 @@ const userSchema = new mongoose.Schema(
     password: String,
     role: {
       type: String,
-      enum: ["admin", "content_manager", "viewer"],
+      enum: ["superadmin","admin", "content_manager", "viewer"],
       default: "viewer"
     },
     companyId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
-      required: true
+      
+      // required: true
     }
   },
   { timestamps: true }

@@ -5,7 +5,7 @@ const allowRoles = require("../middleware/roleMiddleware");
 
 const router = express.Router();
 
-router.post("/", protect, allowRoles("admin"), createUser);
+router.post("/content", protect, allowRoles("admin"), createUser);
 router.get("/", protect, allowRoles("admin"), getUsers);
 router.delete("/:id", protect, allowRoles("admin"), deleteUser);
 

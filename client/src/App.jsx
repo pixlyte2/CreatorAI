@@ -1,40 +1,59 @@
-import { Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
+import { Routes, Route, Navigate } from "react-router-dom";
+import Login from "./auth/Login";
+import SuperAdminLogin from "./auth/SuperAdminLogin";
+import PrivateRoute from "./routes/PrivateRoutes";
+
 import AdminDashboard from "./pages/AdminDashboard";
 import ContentDashboard from "./pages/ContentDashboard";
-import ProtectedRoute from "./components/ProtectedRoute";
+import ViewerDashboard from "./pages/ViewerDashboard";
+import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 
-function App() {
+export default function App() {
   return (
     <Routes>
-      {/* PUBLIC */}
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      {/* default route */}
+      <Route path="/" element={<Navigate to="/login" />} />
 
-      {/* ADMIN */}
+      {/* public */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/superadmin-login" element={<SuperAdminLogin />} />
+
+      {/* protected */}
       <Route
-        path="/admin/dashboard"
+        path="/admin"
         element={
-          <ProtectedRoute allowedRoles={["admin"]}>
+          <PrivateRoute allowedRoles={["admin"]}>
             <AdminDashboard />
-          </ProtectedRoute>
+          </PrivateRoute>
         }
       />
 
-      {/* CONTENT MANAGER */}
       <Route
-        path="/content/dashboard"
+        path="/content"
         element={
-          <ProtectedRoute allowedRoles={["content_manager"]}>
+          <PrivateRoute allowedRoles={["content_manager"]}>
             <ContentDashboard />
-          </ProtectedRoute>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/viewer"
+        element={
+          <PrivateRoute allowedRoles={["viewer"]}>
+            <ViewerDashboard />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/superadmin"
+        element={
+          <PrivateRoute allowedRoles={["superadmin"]}>
+            <SuperAdminDashboard />
+          </PrivateRoute>
         }
       />
     </Routes>
   );
 }
-
-export default App;

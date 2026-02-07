@@ -1,38 +1,86 @@
 const User = require("../models/User");
 const Company = require("../models/Company");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 /**
- * 🔐 CREATE SUPER ADMIN (ONE TIME API)
- * ⚠️ Call only once, then disable route
+ * 🔐 CREATE SUPER ADMIN (ONE TIME)
  */
 const createSuperAdmin = async (req, res) => {
-  try {
-    const exists = await User.findOne({ role: "superadmin" });
-    if (exists) {
-      return res.status(400).json({ message: "SuperAdmin already exists" });
-    }
+  const exists = await User.findOne({ role: "superadmin" });
+  if (exists)
+    return res.status(400).json({ message: "SuperAdmin already exists" });
 
-    const hash = await bcrypt.hash("superadmin123", 10);
+  const hash = await bcrypt.hash("superadmin123", 10);
 
-    const superadmin = await User.create({
-      name: "Super Admin",
-      email: "superadmin@creatorai.com",
-      password: hash,
-      role: "superadmin"
-    });
+  const superadmin = await User.create({
+    name: "Super Admin",
+    email: "superadmin@creatorai.com",
+    password: hash,
+    role: "superadmin"
+  });
 
-    res.json({
-      message: "🔥 SuperAdmin created",
-      superadmin
-    });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+  res.json({ message: "SuperAdmin created", superadmin });
 };
 
 /**
- * 🔥 SUPER ADMIN creates Admin + Company
+ * 🔑 SUPER ADMIN LOGIN
+ */
+const superAdminLogin = async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email, role: "superadmin" });
+  if (!user) return res.status(404).json({ message: "Not found" });
+
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) return res.status(401).json({ message: "Wrong password" });
+
+  const token = jwt.sign(
+    { id: user._id, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: "1d" }
+  );
+
+  res.json({ token, role: user.role });
+};
+
+/**
+ * 👁️ READ SUPER ADMIN PROFILE
+ */
+const getSuperAdminProfile = async (req, res) => {
+  const user = await User.findById(req.user.id).select("-password");
+  res.json(user);
+};
+
+/**
+ * ✏️ UPDATE SUPER ADMIN
+ */
+const updateSuperAdmin = async (req, res) => {
+  const { name, email, password } = req.body;
+
+  const update = { name, email };
+
+  if (password) {
+    update.password = await bcrypt.hash(password, 10);
+  }
+
+  const user = await User.findByIdAndUpdate(req.user.id, update, {
+    new: true
+  }).select("-password");
+
+  res.json(user);
+};
+
+/**
+ * ❌ DELETE SUPER ADMIN
+ */
+const deleteSuperAdmin = async (req, res) => {
+  await User.findByIdAndDelete(req.user.id);
+  res.json({ message: "SuperAdmin deleted" });
+};
+
+/**
+ * 🔥 SUPER ADMIN → CREATE ADMIN + COMPANY
  */
 const createAdminCompany = async (req, res) => {
   try {
@@ -44,8 +92,10 @@ const createAdminCompany = async (req, res) => {
 
     const hash = await bcrypt.hash(password, 10);
 
+    // create company
     const company = await Company.create({ name: companyName });
 
+    // create admin
     const admin = await User.create({
       name,
       email,
@@ -58,9 +108,12 @@ const createAdminCompany = async (req, res) => {
     await company.save();
 
     res.json({
-      message: "Admin & Company created successfully",
-      admin,
-      company
+      message: "Admin created by SuperAdmin",
+      admin: {
+        name: admin.name,
+        email: admin.email
+      },
+      company: company.name
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -68,7 +121,7 @@ const createAdminCompany = async (req, res) => {
 };
 
 /**
- * 👥 View all companies
+ * 👥 VIEW ALL COMPANIES
  */
 const getAllCompanies = async (req, res) => {
   const companies = await Company.find().populate("createdBy", "name email");
@@ -76,7 +129,7 @@ const getAllCompanies = async (req, res) => {
 };
 
 /**
- * 👤 View all admins
+ * 👤 VIEW ALL ADMINS
  */
 const getAllAdmins = async (req, res) => {
   const admins = await User.find({ role: "admin" }).populate("companyId");
@@ -84,7 +137,7 @@ const getAllAdmins = async (req, res) => {
 };
 
 /**
- * ❌ Delete company + users
+ * ❌ DELETE COMPANY + USERS
  */
 const deleteCompany = async (req, res) => {
   const { companyId } = req.params;
@@ -97,7 +150,11 @@ const deleteCompany = async (req, res) => {
 
 module.exports = {
   createSuperAdmin,
-  createAdminCompany,
+  superAdminLogin,
+  getSuperAdminProfile,
+  updateSuperAdmin,
+  deleteSuperAdmin,
+  createAdminCompany,   // ✅ ADDED
   getAllCompanies,
   getAllAdmins,
   deleteCompany

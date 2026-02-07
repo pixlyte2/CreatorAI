@@ -11,6 +11,7 @@ const userRoutes = require("./routes/userRoutes");
 const channelRoutes = require("./routes/channelRoutes");
 const promptRoutes = require("./routes/promptRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
+const superAdminRoutes = require("./routes/superAdminRoutes");
 
 // Connect MongoDB
 connectDB();
@@ -37,6 +38,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/channels", channelRoutes);
 app.use("/api/prompts", promptRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/superadmin", superAdminRoutes);
 
 /**
  * 🧪 Health Check

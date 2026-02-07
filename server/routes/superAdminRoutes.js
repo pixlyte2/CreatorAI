@@ -6,21 +6,41 @@ const allowRoles = require("../middleware/roleMiddleware");
 
 const {
   createSuperAdmin,
+  superAdminLogin,
   createAdminCompany,
+  getSuperAdminProfile,
+  updateSuperAdmin,
+  deleteSuperAdmin,
   getAllCompanies,
   getAllAdmins,
   deleteCompany
 } = require("../controllers/superAdminController");
 
-/**
- * ⚠️ TEMP: RUN ONLY ONCE
- */
-router.post("/create-superadmin", createSuperAdmin);
+// one-time
+router.post("/create", createSuperAdmin);
 
-// 🔐 PROTECTED
-router.post("/create-admin", protect, allowRoles("superadmin"), createAdminCompany);
+// auth
+router.post("/login", superAdminLogin);
+
+// protected
+router.get("/me", protect, allowRoles("superadmin"), getSuperAdminProfile);
+router.put("/me", protect, allowRoles("superadmin"), updateSuperAdmin);
+router.delete("/me", protect, allowRoles("superadmin"), deleteSuperAdmin);
+
 router.get("/companies", protect, allowRoles("superadmin"), getAllCompanies);
 router.get("/admins", protect, allowRoles("superadmin"), getAllAdmins);
-router.delete("/company/:companyId", protect, allowRoles("superadmin"), deleteCompany);
+router.delete(
+  "/company/:companyId",
+  protect,
+  allowRoles("superadmin"),
+  deleteCompany
+);
+
+router.post(
+  "/create-admin",
+  protect,
+  allowRoles("superadmin"),
+  createAdminCompany
+);
 
 module.exports = router;
