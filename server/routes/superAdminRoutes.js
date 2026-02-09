@@ -13,7 +13,8 @@ const {
   deleteSuperAdmin,
   getAllCompanies,
   getAllAdmins,
-  deleteCompany
+  deleteCompany,
+  updateAdmin
 } = require("../controllers/superAdminController");
 
 // one-time
@@ -26,6 +27,9 @@ router.post("/login", superAdminLogin);
 router.get("/me", protect, allowRoles("superadmin"), getSuperAdminProfile);
 router.put("/me", protect, allowRoles("superadmin"), updateSuperAdmin);
 router.delete("/me", protect, allowRoles("superadmin"), deleteSuperAdmin);
+
+
+router.put("/admin/:adminId",protect,allowRoles("superadmin"),updateAdmin);
 
 router.get("/companies", protect, allowRoles("superadmin"), getAllCompanies);
 router.get("/admins", protect, allowRoles("superadmin"), getAllAdmins);

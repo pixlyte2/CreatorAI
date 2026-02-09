@@ -1,24 +1,25 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import PrivateRoute from "./components/PrivateRoute";
+
 import Login from "./auth/Login";
 import SuperAdminLogin from "./auth/SuperAdminLogin";
-import PrivateRoute from "./routes/PrivateRoutes";
 
-import AdminDashboard from "./pages/AdminDashboard";
-import ContentDashboard from "./pages/ContentDashboard";
-import ViewerDashboard from "./pages/ViewerDashboard";
-import SuperAdminDashboard from "./pages/SuperAdminDashboard";
+import AdminDashboard from "./pages/admin/Dashboard";
+import AdminPrompts from "./pages/admin/Prompts";
+import ContentPrompts from "./pages/content/Prompts";
+import ViewerPrompts from "./pages/viewer/Prompts";
+import Users from "./pages/admin/Users";
+import Channels from "./pages/admin/Channels";
+import Dashboard from "./pages/superadmin/Dashboard"
 
 export default function App() {
   return (
     <Routes>
-      {/* default route */}
       <Route path="/" element={<Navigate to="/login" />} />
 
-      {/* public */}
       <Route path="/login" element={<Login />} />
       <Route path="/superadmin-login" element={<SuperAdminLogin />} />
 
-      {/* protected */}
       <Route
         path="/admin"
         element={
@@ -29,31 +30,57 @@ export default function App() {
       />
 
       <Route
-        path="/content"
+        path="/admin/prompts"
         element={
-          <PrivateRoute allowedRoles={["content_manager"]}>
-            <ContentDashboard />
+          <PrivateRoute allowedRoles={["admin"]}>
+            <AdminPrompts />
           </PrivateRoute>
         }
       />
 
       <Route
-        path="/viewer"
+        path="/content/prompts"
         element={
-          <PrivateRoute allowedRoles={["viewer"]}>
-            <ViewerDashboard />
+          <PrivateRoute allowedRoles={["content_manager"]}>
+            <ContentPrompts />
           </PrivateRoute>
         }
       />
 
+      <Route
+        path="/viewer/prompts"
+        element={
+          <PrivateRoute allowedRoles={["viewer"]}>
+            <ViewerPrompts />
+          </PrivateRoute>
+        }
+      />
+
+    <Route
+        path="/admin/users"
+        element={
+          <PrivateRoute allowedRoles={["admin"]}>
+            <Users />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/admin/channels"
+        element={
+          <PrivateRoute allowedRoles={["admin"]}>
+            <Channels />
+          </PrivateRoute>
+        }
+      />
       <Route
         path="/superadmin"
         element={
           <PrivateRoute allowedRoles={["superadmin"]}>
-            <SuperAdminDashboard />
+            <Dashboard />
           </PrivateRoute>
         }
       />
+
     </Routes>
   );
 }

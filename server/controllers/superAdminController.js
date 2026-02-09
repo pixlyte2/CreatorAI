@@ -148,6 +148,40 @@ const deleteCompany = async (req, res) => {
   res.json({ message: "Company & users deleted" });
 };
 
+/**
+ * ✏️ SUPER ADMIN → UPDATE ADMIN
+ */
+const updateAdmin = async (req, res) => {
+  try {
+    const { adminId } = req.params;
+    const { name, email, password } = req.body;
+
+    const update = { name, email };
+
+    if (password) {
+      update.password = await bcrypt.hash(password, 10);
+    }
+
+    const admin = await User.findOneAndUpdate(
+      { _id: adminId, role: "admin" },
+      update,
+      { new: true }
+    ).select("-password");
+
+    if (!admin) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    res.json({
+      message: "Admin updated successfully",
+      admin
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
 module.exports = {
   createSuperAdmin,
   superAdminLogin,
@@ -157,5 +191,6 @@ module.exports = {
   createAdminCompany,   // ✅ ADDED
   getAllCompanies,
   getAllAdmins,
-  deleteCompany
+  deleteCompany,
+  updateAdmin
 };
